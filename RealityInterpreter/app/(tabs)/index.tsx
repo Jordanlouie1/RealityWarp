@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 const HomeScreen = () => {
-  const [selectedAnimal, setSelectedAnimal] = useState("Parrot");
+  const [selectedAnimal, setSelectedAnimal] = useState("Bird");
 
   const animals = {
     Dog: {
@@ -29,13 +29,12 @@ const HomeScreen = () => {
       description:
         "Elephants are large mammals of the family Elephantidae and the order Proboscidea. Three species are currently recognised: the African bush elephant, the African forest elephant, and the Asian elephant. Elephants are scattered throughout sub-Saharan Africa, South Asia, and Southeast Asia. Elephantidae is the only surviving family of the order Proboscidea; other, now extinct, families of the order include mammoths and mastodons. Previously, the order was considered to contain, along with Elephantidae, the mammoths, but following a 2007 study, it is now generally accepted that they are a separate order. Elephants are the largest living land animals on Earth today.",
     },
-    Parrot: {
-      name: "Parrot",
+    Bird: {
+      name: "Bird",
       image:
         "https://raw.githubusercontent.com/Jordanlouie1/RealityWarp/refs/heads/main/RealityInterpreter/assets/images/parrot.png",
-        wikiLink: "https://en.wikipedia.org/wiki/Parrot",
-      description:
-        "Parrots, also known as psittacines, are birds of the roughly 398 species in 92 genera comprising the order Psittaciformes, found mostly in tropical and subtropical regions. The order is subdivided into three superfamilies: the Psittacoidea (true parrots), the Cacatuoidea (cockatoos), and the Strigopoidea (New Zealand parrots). Parrots have a generally pantropical distribution with several species inhabiting temperate regions in the Southern Hemisphere, as well. The greatest diversity of parrots is in South America and Australasia.",
+        wikiLink: "https://en.wikipedia.org/wiki/Bird",
+      description: "Birds, also known as Aves, are a group of endothermic vertebrates, characterised by feathers, toothless beaked jaws, the laying of hard-shelled eggs, a high metabolic rate, a four-chambered heart, and a strong yet lightweight skeleton. Birds live worldwide and range in size from the 5 cm (2 in) bee hummingbird to the 2.75 m (9 ft) ostrich. They rank as the world's most numerically-successful class of tetrapods, with approximately ten thousand living species, more than half of these being passerines, sometimes known as perching birds. Birds have wings whose development varies according to species; the only known groups without wings are the extinct moa and elephant birds. Wings, which evolved from forelimbs, gave birds the ability to fly, although further evolution has led to the loss of flight in some birds, including ratites, penguins, and diverse endemic island species.",
     },
     Snake: {
       name: "Snake",
@@ -46,6 +45,24 @@ const HomeScreen = () => {
         "Snakes are elongated, legless, carnivorous reptiles of the suborder Serpentes. Like all other squamates, snakes are ectothermic, amniote vertebrates covered in overlapping scales. Many species of snakes have skulls with many more joints than their lizard ancestors, enabling them to swallow prey much larger than their heads with their highly mobile jaws. To accommodate their narrow bodies, snakes' paired organs (such as kidneys) appear one in front of the other instead of side by side, and most have only one functional lung. Some species retain a pelvic girdle with a pair of vestigial claws on either side of the cloaca.",
     },
   };
+
+  const fetchCurrentAnimal = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/current_animal");
+      const data = await response.json();
+      console.log("Current animal:", data);
+      if (animals[data.animal]) {
+        setSelectedAnimal(data.animal);
+      }
+    } catch (error) {
+      console.error("Error fetching current animal:", error);
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(fetchCurrentAnimal, 2000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -72,6 +89,9 @@ const HomeScreen = () => {
       </View>
       <View style={styles.content}>
         <View style={styles.videoContainer}></View>
+
+
+
         <Image
           source={{ uri: "http://127.0.0.1:5000/video_feed" }}
           style={styles.videoFeed}
